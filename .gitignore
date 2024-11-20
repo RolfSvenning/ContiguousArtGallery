@@ -1,5 +1,10 @@
 # My additions
 .DS_Store
+build/
+cmake-build-debug/
+CGAL-6.0.1/
+.idea/
+
 
 # Prerequisites
 *.d
