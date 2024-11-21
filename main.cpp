@@ -13,6 +13,7 @@
 
 // Mine
 #include "Algorithm1.h"
+#include "Algorithm2.h"
 
 
 //typedef Kernel::Point_2 Point_2;
@@ -21,20 +22,17 @@
 
 int main( )
 {
-    //construct two non-intersecting nested polygons
-//    Polygon polygon1;
-//    polygon1.push_back(Point_2(0, 0));
-//    polygon1.push_back(Point_2(2, 0));
-//    polygon1.push_back(Point_2(2, 2));
-//    polygon1.push_back(Point(1, 1.75));
-//    polygon1.push_back(Point(0, 2));
-//    Polygon polygon2;
-//    polygon2.push_back(Point(0.5, 0.5));
-//    polygon2.push_back(Point(1.5, 0.5));
-//    polygon2.push_back(Point(1.5, 1.5));
-//    polygon2.push_back(Point(0.5, 1.5));
+    long T = 5;
+    Point p1(0, 0), p2(0, 3), p3(4, - 1), p4(2, 3);
+    std::vector<Segment> segments = {Segment(p1, p2), Segment(p2, p3), Segment(p3, p4), Segment(p4, p1)};
+    Polygon P;
+    CGAL::insert_non_intersecting_curves(P, segments.begin(), segments.end());
 
-    algorithm1();
+    algorithm1(10, P);
+
+    return 1;
+}
+
 
 //    //Insert the polygons into a constrained triangulation
 //    CDT cdt;
@@ -54,10 +52,5 @@ int main( )
 //    {
 //        if ( get(in_domain, f) ) ++count;
 //    }
-    int count = -1;
-    std::cout << "There are " << count << " faces in the domain." << std::endl;
-
 //    Polygon_triangulation_gs_options<CDT> gso(in_domain);
 //    CGAL::draw(polygon1);
-    return 0;
-}

@@ -4,6 +4,7 @@ build/
 cmake-build-debug/
 CGAL-6.0.1/
 .idea/
+cmake-build-vcpkg/
 
 
 # Prerequisites

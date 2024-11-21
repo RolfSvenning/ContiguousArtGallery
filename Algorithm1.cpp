@@ -1,16 +1,22 @@
 #include "Algorithm1.h"
-#include <CGAL/Exact_rational.h>
-
-typedef CGAL::Exact_rational Rational;
-typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
-typedef Kernel::Point_2 Point_2;
 
 
-void algorithm1(){
-    std::cout << "Algorithm 1" << std::endl;
+void algorithm1(long T, Polygon P){
+    std::cout << "Algorithm 1 running" << std::endl;
 
 
-//    return 0;
+    Edge_iterator e = P.edges_begin();
+    auto p = e->target()->point();
+
+
+    // forloop over T neat syntax
+    for (int i = 0; i < T; i++){
+        auto [p_new, E_new] =  greedyStep(P, e, p);
+        p = p_new;
+        e = E_new;
+    }
+
+//    return 1;
 }
 
 //#include <CGAL/Exact_predicates_exact_constructions_kernel.h>

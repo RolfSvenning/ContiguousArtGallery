@@ -7,7 +7,10 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(CGAL REQUIRED OPTIONAL_COMPONENTS Qt6)
 #create the executable of the application
 #create_single_source_cgal_program("main.cpp")
-add_executable(main main.cpp Algorithm1.cpp)
+add_executable(main main.cpp Algorithm1.cpp
+        "Algorithm2.cpp"
+        "Algorithm2.h")
+target_link_libraries(main PRIVATE CGAL::CGAL) # needed on windows
 
 
 if(CGAL_Qt6_FOUND)
