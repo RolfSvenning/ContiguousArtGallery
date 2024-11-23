@@ -9,7 +9,9 @@ find_package(CGAL REQUIRED OPTIONAL_COMPONENTS Qt6)
 #create_single_source_cgal_program("main.cpp")
 add_executable(main main.cpp Algorithm1.cpp
         "Algorithm2.cpp"
-        "Algorithm2.h")
+        "Algorithm2.h"
+        Helper.cpp
+        Helper.h)
 target_link_libraries(main PRIVATE CGAL::CGAL) # needed on windows
 
 

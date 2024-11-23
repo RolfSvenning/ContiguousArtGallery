@@ -14,6 +14,7 @@
 // Mine
 #include "Algorithm1.h"
 #include "Algorithm2.h"
+#include "Helper.h"
 
 
 //typedef Kernel::Point_2 Point_2;
@@ -22,13 +23,19 @@
 
 int main( )
 {
-    long T = 5;
-    Point p1(0, 0), p2(0, 3), p3(4, - 1), p4(2, 3);
-    std::vector<Segment> segments = {Segment(p1, p2), Segment(p2, p3), Segment(p3, p4), Segment(p4, p1)};
-    Polygon P;
-    CGAL::insert_non_intersecting_curves(P, segments.begin(), segments.end());
+    long T = 1;
+//
+    //create polygon
+    std::vector<Point> points = {Point(0,4), Point(0,0), Point(3,2), Point(4,0), Point(4,4), Point(1,2)};
+    std::vector<Segment> segments;
+    for (int i = 0; i < points.size(); i++) {
+        segments.push_back(Segment(points[i], points[(i + 1) % points.size()]));
+    }
 
-    algorithm1(10, P);
+    Polygon P;
+    CGAL::insert_non_intersecting_curves(P,segments.begin(),segments.end());
+    printPolygonEdges(P, "P");
+//    algorithm1(T, P); // TRAVERSE FACES INSTEAD AOF EDGES OF ARRANGEMENT
 
     return 1;
 }
