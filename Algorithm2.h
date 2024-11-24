@@ -8,13 +8,13 @@
 // Geometric primitives
 typedef Kernel::Point_2                                     Point;
 typedef Kernel::Segment_2                                   Segment;
+typedef Polygon::Ccb_halfedge_const_circulator              Halfedge_circulator;
 
-//typedef Polygon::Face_const_handle                          Face_handle;
 
 
-std::tuple<Point, Edge_iterator> greedyStep(Polygon P, Edge_iterator e, Point p);
+std::tuple<Point, Halfedge_circulator> greedyStep(Polygon P, Halfedge_circulator e, Point p);
 
-Polygon computeVisibilityPolygon(const Polygon& P, const Point& p, Edge_iterator e);
+Polygon computeVisibilityPolygon(const Polygon& P, const Point& p, Halfedge_circulator e);
 
 
 #endif //CONTIGUOUSARTGALLERY_ALGORITHM2_H

@@ -29,13 +29,14 @@ int main( )
     std::vector<Point> points = {Point(0,4), Point(0,0), Point(3,2), Point(4,0), Point(4,4), Point(1,2)};
     std::vector<Segment> segments;
     for (int i = 0; i < points.size(); i++) {
-        segments.push_back(Segment(points[i], points[(i + 1) % points.size()]));
+        segments.emplace_back(points[i], points[(i + 1) % points.size()]);
     }
 
     Polygon P;
     CGAL::insert_non_intersecting_curves(P,segments.begin(),segments.end());
     printPolygonEdges(P, "P");
-//    algorithm1(T, P); // TRAVERSE FACES INSTEAD AOF EDGES OF ARRANGEMENT
+
+    algorithm1(T, P);
 
     return 1;
 }

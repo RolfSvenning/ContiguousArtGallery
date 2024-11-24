@@ -1,13 +1,13 @@
 #include "Algorithm1.h"
-
+#include "Helper.h"
 
 void algorithm1(long T, Polygon P){
     std::cout << "Algorithm 1 running" << std::endl;
 
-
-    Edge_iterator e = P.edges_begin();
-    auto p = e->target()->point();
-
+    // get the first edge and point
+    Halfedge_circulator e = getEdgesOfPolygon(P);
+//    Point p = e->target()->point();
+    Point p = CGAL::midpoint(e->source()->point(), e->target()->point());
 
     // forloop over T neat syntax
     for (int i = 0; i < T; i++){

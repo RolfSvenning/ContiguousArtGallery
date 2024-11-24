@@ -14,4 +14,6 @@ typedef Polygon::Edge_const_iterator                        Edge_iterator;
 
 void printPolygonEdges(const Polygon& P, const std::string& name);
 
+Polygon::Ccb_halfedge_const_circulator getEdgesOfPolygon(const Polygon& P);
+
 #endif //CONTIGUOUSARTGALLERY_HELPER_H
