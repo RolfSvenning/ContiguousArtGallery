@@ -81,7 +81,7 @@ std::tuple<Point, Halfedge_circulator> greedyStep(Polygon P, Halfedge_circulator
 
     // Compute the initial visibility polygon
     Polygon F = computeVisibilityPolygon(P, p, e);
-//    drawPolygons(P, F); // not working on Windows machine atm
+    drawPolygons(P, F);
 
     if (p == e->target()->point()){ // if p is in the middle of e then don't move to the next edge
         e++;

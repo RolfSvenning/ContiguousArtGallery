@@ -7,18 +7,12 @@
 
 #include <iostream>
 #include <CGAL/Exact_rational.h>
-//#include <unordered_map>
 
-//#include <boost/property_map/property_map.hpp>
 
 // Mine
 #include "Algorithm1.h"
-#include "Algorithm2.h"
 #include "Helper.h"
 
-
-//typedef Kernel::Point_2 Point_2;
-//typedef Kernel::Segment_2 Segment_2;
 
 
 int main( )
