@@ -4,9 +4,6 @@
 #include <CGAL/Simple_polygon_visibility_2.h>
 #include <tuple>
 #include <iostream>
-#include <CGAL/Arr_naive_point_location.h>
-#include <CGAL/draw_arrangement_2.h>
-#include <sstream> // for better printing
 #include <CGAL/Boolean_set_operations_2.h> // for intersection
 
 // CGAL typedefs
