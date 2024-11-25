@@ -122,3 +122,49 @@ void printArrangementEdges(const Arrangement_2& P, const std::string& name) {
     std::cout << std::endl;
 
 }
+
+void validatePointOnEdge(const Point& p, Halfedge_circulator e) {
+    // Extract endpoints of the edge
+    const Point& source = e->source()->point();
+    const Point& target = e->target()->point();
+
+    // Allow p to be exactly the source or target of the edge
+    if (p == source || p == target) {
+        return; // Valid case, no exception
+    }
+
+    std::ostringstream oss;
+    // Check if p is collinear with the edge
+    if (!CGAL::collinear(source, target, p)) {
+        throw std::invalid_argument([&]() {
+            oss << "Point p (" << p << ") is not collinear with edge e defined by endpoints ("
+                << source << ") -> (" << target << ").";
+            return oss.str();
+        }());
+    }
+
+    // Check if point p is within the segment bounds
+    if (!(CGAL::compare(CGAL::min(source.x(), target.x()), p.x()) != CGAL::LARGER &&
+          CGAL::compare(CGAL::max(source.x(), target.x()), p.x()) != CGAL::SMALLER &&
+          CGAL::compare(CGAL::min(source.y(), target.y()), p.y()) != CGAL::LARGER &&
+          CGAL::compare(CGAL::max(source.y(), target.y()), p.y()) != CGAL::SMALLER)) {
+        std::ostringstream oss;
+        oss << "Point p (" << p << ") is collinear but not within the segment bounds of edge e with endpoints ("
+            << source << ") -> (" << target << ").";
+        throw std::invalid_argument(oss.str());
+    }
+}
+
+void drawArrangements(const Arrangement_2& A1, const Arrangement_2& A2) {
+    Arrangement_2 A_merged;
+    // Insert edges from the first arrangement
+    for (auto edge = A1.edges_begin(); edge != A1.edges_end(); ++edge) {
+        A_merged.insert_in_face_interior(Segment(edge->source()->point(), edge->target()->point()), A_merged.unbounded_face());
+    }
+
+    // Insert edges from the second arrangement
+    for (auto edge = A2.edges_begin(); edge != A2.edges_end(); ++edge) {
+        A_merged.insert_in_face_interior(Segment(edge->source()->point(), edge->target()->point()), A_merged.unbounded_face());
+    }
+    CGAL::draw(A_merged);
+}
