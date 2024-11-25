@@ -26,11 +26,17 @@ int main( )
         segments.emplace_back(points[i], points[(i + 1) % points.size()]);
     }
 
-    Polygon P;
-    CGAL::insert_non_intersecting_curves(P,segments.begin(),segments.end());
-    printPolygonEdges(P, "P");
+    Arrangement_2 A;
+    CGAL::insert_non_intersecting_curves(A,segments.begin(),segments.end());
+    printArrangementEdges(A, "A");
 
-    algorithm1(T, P);
+    Polygon_2 P = arrangement_to_polygon(A);
+//    std::cout << "Polygon vertices:" << std::endl;
+//    for (const auto& point : P) {
+//        std::cout << "(" << point.x() << ", " << point.y() << ")" << std::endl;
+//    }
+
+    algorithm1(T, A);
 
     return 1;
 }

@@ -7,12 +7,10 @@
 #include <CGAL/Arr_naive_point_location.h>
 #include <CGAL/draw_arrangement_2.h>
 #include <sstream> // for better printing
-
+#include <CGAL/Boolean_set_operations_2.h> // for intersection
 
 // CGAL typedefs
-typedef CGAL::Triangular_expansion_visibility_2<Polygon>  VP_type;     // Visibility polygon class
-typedef Polygon::Halfedge_const_handle                    Halfedge_const_handle;
-
+typedef CGAL::Triangular_expansion_visibility_2<Arrangement_2>  VA_type;    // Visibility polygon class
 
 void validatePointOnEdge(const Point& p, Halfedge_circulator e) {
     // Extract endpoints of the edge
@@ -46,57 +44,70 @@ void validatePointOnEdge(const Point& p, Halfedge_circulator e) {
     }
 }
 
-void drawPolygons(const Polygon& P1, const Polygon& P2) {
-    Polygon P_merged;
+void drawArrangements(const Arrangement_2& A1, const Arrangement_2& A2) {
+    Arrangement_2 A_merged;
     // Insert edges from the first arrangement
-    for (auto edge = P1.edges_begin(); edge != P1.edges_end(); ++edge) {
-        P_merged.insert_in_face_interior(Segment(edge->source()->point(), edge->target()->point()), P_merged.unbounded_face());
+    for (auto edge = A1.edges_begin(); edge != A1.edges_end(); ++edge) {
+        A_merged.insert_in_face_interior(Segment(edge->source()->point(), edge->target()->point()), A_merged.unbounded_face());
     }
 
     // Insert edges from the second arrangement
-    for (auto edge = P2.edges_begin(); edge != P2.edges_end(); ++edge) {
-        P_merged.insert_in_face_interior(Segment(edge->source()->point(), edge->target()->point()), P_merged.unbounded_face());
+    for (auto edge = A2.edges_begin(); edge != A2.edges_end(); ++edge) {
+        A_merged.insert_in_face_interior(Segment(edge->source()->point(), edge->target()->point()), A_merged.unbounded_face());
     }
-    CGAL::draw(P_merged);
+    CGAL::draw(A_merged);
 }
 
-Polygon computeVisibilityPolygon(const Polygon & P, const Point& p, Halfedge_circulator e) {
+Arrangement_2 computeVisibilityArrangement(const Arrangement_2 & A, const Point& p, Halfedge_circulator e) {
     // Assert point p on edge e or throw error
     validatePointOnEdge(p, e);
 
     // Compute the visibility polygon
-    Polygon VP;
-    VP_type VP_calculator(P);
-    VP_calculator.compute_visibility(p, e, VP);
+    Arrangement_2 VA;
+    VA_type VP_calculator(A);
+    VP_calculator.compute_visibility(p, e, VA);
 
-    printPolygonEdges(VP, "VP ");
+    printArrangementEdges(VA, "VP ");
 
-    return VP;
+    return VA;
 }
 
-std::tuple<Point, Halfedge_circulator> greedyStep(Polygon P, Halfedge_circulator e, Point p){
-    printPolygonEdges(P, "P");
+std::tuple<Point, Halfedge_circulator> greedyStep(Arrangement_2 A, Halfedge_circulator e, Point p){
+    printArrangementEdges(A, "A");
     std::cout << "Greedy step from p: " << p << std::endl;
     std::cout << "e: " << e->source()->point() << " -> " << e->target()->point() << std::endl;
 
-    // Compute the initial visibility polygon
-    Polygon F = computeVisibilityPolygon(P, p, e);
-    drawPolygons(P, F);
+    // Compute the initial feasible polygon set
+    Arrangement_2 F = computeVisibilityArrangement(A, p, e);
+    drawArrangements(A, F);
+    Polygon_set_2 FPS;
+    FPS.insert(arrangement_to_polygon(F));
 
     if (p == e->target()->point()){ // if p is in the middle of e then don't move to the next edge
         e++;
     }
 
-    for (int i = 0; P.number_of_vertices() > 0; i++){
+    for (int i = 0; A.number_of_vertices() > 0; i++){
         p = e->target()->point();
         std :: cout << "Greedy step now at p: " << p << " for edge: " << e->source()->point() << " -> " << e->target()->point() << std::endl;
-        Polygon VP = computeVisibilityPolygon(P, p, e);
+        Arrangement_2 VA = computeVisibilityArrangement(A, p, e);
+        // intersect F and VA
+//        if (not CGAL::do_intersect(F, VA)){
+//            std::cout << "Intersection detected" << std::endl;
+//            drawArrangements(F, VA);
+//        }
+        FPS.intersection(arrangement_to_polygon(VA));
+        drawArrangements(A, polygon_set_to_arrangement(FPS));
 
+
+//        CGAL::intersection(F, VA);
+//        drawArrangements(A, VA);
         e++;
 
-        // if i = size of P then break => solved by 1 guard
-        if (i == P.number_of_vertices() + 1){
-            break;
+        // if i = size of A then break => solved by 1 guard
+        if (i == A.number_of_vertices() + 1){
+            std :: cout << "Solved by 1 guard" << std::endl;
+            throw std::invalid_argument("");
         }
     }
 

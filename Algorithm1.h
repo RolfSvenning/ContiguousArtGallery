@@ -3,6 +3,6 @@
 
 #include "Algorithm2.h"
 
-void algorithm1(long T, Polygon P);
+void algorithm1(long T, Arrangement_2 P);
 
 #endif //CONTIGUOUSARTGALLERY_ALGORITHM1_H

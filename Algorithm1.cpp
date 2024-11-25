@@ -1,11 +1,11 @@
 #include "Algorithm1.h"
 #include "Helper.h"
 
-void algorithm1(long T, Polygon P){
+void algorithm1(long T, Arrangement_2 P){
     std::cout << "Algorithm 1 running" << std::endl;
 
     // get the first edge and point
-    Halfedge_circulator e = getEdgesOfPolygon(P);
+    Halfedge_circulator e = getEdgesOfArrangement(P);
 //    Point p = e->target()->point();
     Point p = CGAL::midpoint(e->source()->point(), e->target()->point());
 
