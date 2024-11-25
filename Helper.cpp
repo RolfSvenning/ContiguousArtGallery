@@ -6,15 +6,17 @@
 // function that returns outer cbb for Polygon P
 // connected component of the boundary (CCB)
 // see: https://doc.cgal.org/latest/Arrangement_on_surface_2/index.html#fig__aos_fig-arr_segs
-Arrangement_2::Ccb_halfedge_const_circulator getEdgesOfArrangement(const Arrangement_2& P) {
+std::vector<Halfedge_circulator> getEdgesOfArrangement(const Arrangement_2& P) {
     // assert Euler's formula for planar graphs
     if (not P.number_of_vertices() - P.number_of_edges() + P.number_of_faces() == 2) {
-        throw std::invalid_argument("Euler's formula for planar graphs not satisfied");
+        std::cerr << "Euler's formula for planar graphs is not satisfied" << std::endl;
+        throw std::invalid_argument("");
     }
 
     // assert number of faces is 2 else throw an error
     if (P.number_of_faces() != 2) {
-        throw std::invalid_argument("Number of faces is not 2");
+        std::cerr << "The number of faces is not 2" << std::endl;
+        throw std::invalid_argument("");
     }
     // get the inner face
     auto face = P.faces_begin();
@@ -22,22 +24,28 @@ Arrangement_2::Ccb_halfedge_const_circulator getEdgesOfArrangement(const Arrange
         face++;
     }
     if (face->is_unbounded()) {
-        throw std::invalid_argument("Both faces are unbounded");
+        std::cerr << "Both faces are unbounded" << std::endl;
+        throw std::invalid_argument("");
     }
-    return face->outer_ccb();
+
+    std::vector<Halfedge_circulator> E;
+    auto curr = face->outer_ccb();
+
+    do {
+        E.push_back(curr);
+        curr++;
+    } while (curr != face->outer_ccb());
+
+    return E;
 }
 
 // Function to convert arrangement (Polygon) to Polygon_2
 Polygon_2 arrangement_to_polygon(const Arrangement_2& A) {
-    auto ccb = getEdgesOfArrangement(A);
-
-    // Extract points from the boundary
     Polygon_2 polygon;
-    auto curr = ccb;
-    do {
-        polygon.push_back(curr->source()->point());
-        ++curr;
-    } while (curr != ccb);
+
+    for (auto e : getEdgesOfArrangement(A)) {
+        polygon.push_back(e->source()->point());
+    }
 
     return polygon;
 }
@@ -67,11 +75,11 @@ Arrangement_2 polygon_set_to_arrangement(const Polygon_set_2& polygon_set) {
     // Check if the polygon set contains a single polygon
     if (polygon_set.is_empty()) {
         std::cerr << "The polygon set is empty, can't be converted to an arrangement" << std::endl;
-        throw std::invalid_argument("The polygon set is empty.");
+        throw std::invalid_argument("");
     }
     if (polygon_set.number_of_polygons_with_holes() != 1) {
         std::cerr << "The polygon set contains more than one polygon, can't be converted to an arrangement" << std::endl;
-        throw std::invalid_argument("The polygon set contains more than one polygon.");
+        throw std::invalid_argument("");
     }
 
     // Extract the single polygon from the set
@@ -82,7 +90,7 @@ Arrangement_2 polygon_set_to_arrangement(const Polygon_set_2& polygon_set) {
     // Ensure the polygon has no holes (i.e., it is a simple polygon)
     if (!pwh.holes().empty()) {
         std::cerr << "The polygon contains holes and is not simple, can't be converted to an arrangement" << std::endl;
-        throw std::invalid_argument("The polygon contains holes and is not simple.");
+        throw std::invalid_argument("");
     }
 
     // Get the outer boundary
@@ -91,7 +99,7 @@ Arrangement_2 polygon_set_to_arrangement(const Polygon_set_2& polygon_set) {
     // Ensure the outer boundary is simple
     if (!outer_boundary.is_simple()) {
         std::cerr << "The outer boundary of the polygon is not simple, can't be converted to an arrangement" << std::endl;
-        throw std::invalid_argument("The outer boundary of the polygon is not simple.");
+        throw std::invalid_argument("");
     }
 
     // Create an empty arrangement
@@ -109,18 +117,15 @@ Arrangement_2 polygon_set_to_arrangement(const Polygon_set_2& polygon_set) {
 
 
 
-void printArrangementEdges(const Arrangement_2& P, const std::string& name) {
+void printArrangementEdges(const Arrangement_2& A, const std::string& name) {
     std::cout << name << ": ";
-    Arrangement_2::Ccb_halfedge_const_circulator edges = getEdgesOfArrangement(P);
-    Arrangement_2::Ccb_halfedge_const_circulator startEdge = edges;
+    std::vector<Halfedge_circulator > E = getEdgesOfArrangement(A);
 
-    // print the edges of the face
-    std::cout << "(" << edges->source()->point() << " -> " <<  edges->target()->point() << ") ";
-    for (auto eit = ++edges; eit != startEdge; ++eit) {
-        std::cout << "(" << eit->source()->point() << " -> " << eit->target()->point() << ") ";
+    // print the edges E of A
+    for (auto e : E) {
+        std::cout << "(" << e->source()->point() << " -> " << e->target()->point() << ") ";
     }
     std::cout << std::endl;
-
 }
 
 void validatePointOnEdge(const Point& p, Halfedge_circulator e) {
@@ -153,6 +158,36 @@ void validatePointOnEdge(const Point& p, Halfedge_circulator e) {
             << source << ") -> (" << target << ").";
         throw std::invalid_argument(oss.str());
     }
+}
+
+bool pointIsOnEdgeButNotSource(const Point& p, Halfedge_circulator e) {
+    // Extract endpoints of the edge
+    const Point& source = e->source()->point();
+    const Point& target = e->target()->point();
+
+    // Allow p to the target of the edge but not the source
+    if (p == source) {
+        return false;
+    }
+
+    if (p == target) {
+        return true;
+    }
+
+    std::ostringstream oss;
+    // Check if p is collinear with the edge
+    if (!CGAL::collinear(source, target, p)) {
+        return false;
+    }
+
+    // Check if point p is within the segment bounds
+    if (!(CGAL::compare(CGAL::min(source.x(), target.x()), p.x()) != CGAL::LARGER &&
+          CGAL::compare(CGAL::max(source.x(), target.x()), p.x()) != CGAL::SMALLER &&
+          CGAL::compare(CGAL::min(source.y(), target.y()), p.y()) != CGAL::LARGER &&
+          CGAL::compare(CGAL::max(source.y(), target.y()), p.y()) != CGAL::SMALLER)) {
+        return false;
+    }
+    return true;
 }
 
 void drawArrangements(const Arrangement_2& A1, const Arrangement_2& A2) {

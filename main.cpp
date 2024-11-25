@@ -17,10 +17,10 @@
 
 int main( )
 {
-    long T = 1;
+    long T = 5;
 
     //create polygon
-    std::vector<Point> points = {Point(0,4), Point(0,0), Point(3,2), Point(4,0), Point(4,4), Point(1,2)};
+    std::vector<Point> points = {Point(0,4), Point(0,0), Point(4,4), Point(1,2), Point(1,3), Point(2, 4)};
     std::vector<Segment> segments;
     for (int i = 0; i < points.size(); i++) {
         segments.emplace_back(points[i], points[(i + 1) % points.size()]);
