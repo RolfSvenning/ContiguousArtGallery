@@ -26,6 +26,9 @@ int main( )
         segments.emplace_back(points[i], points[(i + 1) % points.size()]);
     }
 
+    // TODO: throw exception: if the vertices of the input polygon are not in general position (no three vertices, not necessarily distinct, are collinear)
+
+
     Arrangement_2 A;
     CGAL::insert_non_intersecting_curves(A,segments.begin(),segments.end());
     printArrangementEdges(A, "A");
