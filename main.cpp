@@ -1,4 +1,3 @@
-//#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Constrained_Delaunay_triangulation_2.h>
 //#include <CGAL/mark_domain_in_triangulation.h>
 //#include <CGAL/Polygon_2.h>
@@ -20,7 +19,8 @@ int main( )
     long T = 5;
 
     //create polygon
-    std::vector<Point> points = {Point(0,4), Point(0,0), Point(4,4), Point(1,2), Point(1,3), Point(2, 4)};
+    std::vector<Point> points = {Point(0,0), Point(5,-1), Point(4,0), Point(8,-2), Point(8,2), Point(4, 1), Point(6, 4),
+                                 Point(10, 2), Point(8, 8), Point(4, 8), Point(6, 10), Point(0, 10), Point(0, 6), Point(8, 6)};
     std::vector<Segment> segments;
     for (int i = 0; i < points.size(); i++) {
         segments.emplace_back(points[i], points[(i + 1) % points.size()]);
