@@ -117,7 +117,7 @@ int main()
     Arrangement_2 A;
     CGAL::insert_non_intersecting_curves(A,segments.begin(),segments.end());
 
-    Polygon_2 P = generate_random_polygon(4242, 10);
+    Polygon_2 P = generate_random_polygon(4242, 40);
     algorithm1(T, polygon_to_arrangement(P));
 
     return 1;

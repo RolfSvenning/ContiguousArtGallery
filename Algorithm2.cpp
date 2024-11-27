@@ -90,9 +90,21 @@ std::vector<Point> findAllIntersectionsBetweenEdgesOfPolygons(const Polygon_2& P
     return I;
 }
 
-std::tuple<Point, Point, Halfedge_circulator> greedyStep(Arrangement_2 A, Halfedge_circulator e, Point p){
+bool passedStart(const Halfedge_circulator e, const std::optional<Point> start, const Point p) {
+    if (start.has_value() and pointIsOnEdgeButNotSource(start.value(), e)){
+        // check if 'p' is closer than 'start' to 'e''s target
+        if (CGAL::squared_distance(p, e->target()->point()) <= CGAL::squared_distance(start.value(), e->target()->point())){
+            std::cout << "Found a solution" << std::endl;
+            return true;
+        }
+    }
+    return false;
+}
+
+std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement_2& A, Halfedge_circulator e, Point p, const std::optional<Point> start) {
     std::cout << "Greedy step from p: " << p << std::endl;
     std::cout << "e: " << e->source()->point() << " -> " << e->target()->point() << std::endl;
+    bool isFinished = false;
 
     // Compute the initial feasible polygon set
     Arrangement_2 F1 = computeVisibilityArrangementAtEdge(A, p, e);
@@ -132,7 +144,7 @@ std::tuple<Point, Point, Halfedge_circulator> greedyStep(Arrangement_2 A, Halfed
 
         } else {
             // F is a polygon
-//            drawArrangements(A, polygon_set_to_arrangement(F));
+            drawArrangements(A, polygon_set_to_arrangement(F));
             if (F.do_intersect(VP)) {
                 F.intersection(VP);
             } else {
@@ -163,6 +175,9 @@ std::tuple<Point, Point, Halfedge_circulator> greedyStep(Arrangement_2 A, Halfed
             std::cerr << "The polygon set F contains more than one polygon" << std::endl;
             throw std::invalid_argument("");
         }
+
+        // check if we passed the starting point and have found a solution
+        isFinished = isFinished or passedStart(e, start, p);
         e++;
     }
 
@@ -185,15 +200,15 @@ std::tuple<Point, Point, Halfedge_circulator> greedyStep(Arrangement_2 A, Halfed
 
     // set FA to be the arrangement for the remaining feasible region
     if (not Fs.empty()){
-        for (auto p: Fs){
-            FA.insert_in_face_interior(p, FA.unbounded_face());
+        for (auto f: Fs){
+            FA.insert_in_face_interior(f, FA.unbounded_face());
         }
         guard = Fs[0];
     } else {
         FA = polygon_set_to_arrangement(F);
         guard = FA.vertices_begin()->point();
     }
-//    drawArrangements(A, FA);
+    drawArrangements(A, FA);
 
     // loop over vertices of FA and compute the visibility polygon of each vertex 'f' to find point furthest on 'e'
     for (auto vit = FA.vertices_begin(); vit != FA.vertices_end(); ++vit) {
@@ -222,12 +237,13 @@ std::tuple<Point, Point, Halfedge_circulator> greedyStep(Arrangement_2 A, Halfed
         }
     }
 
+    isFinished = isFinished or passedStart(e, start, pBest);
     // if pBest == pFirst then 'e' must be set to the previous edge since 'p' must be on 'e' but not its the source
     if (pBest == pFirst){
         e--;
     }
 
-    return std::make_tuple(guard, pBest, e);
+    return std::make_tuple(guard, e, pBest, isFinished);
 }
 
 
