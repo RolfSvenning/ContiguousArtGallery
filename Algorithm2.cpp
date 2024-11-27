@@ -113,6 +113,7 @@ std::tuple<Point, Point, Halfedge_circulator> greedyStep(Arrangement_2 A, Halfed
                     Fp = I[0];
                 } else {
                     // Find the two points in I that are furthest apart along a common line
+                    // TODO: create test case for this
                     Point p1 = I[0];
                     Point p2 = I[1];
                     for (int j = 2; j < size(I); j++) {
