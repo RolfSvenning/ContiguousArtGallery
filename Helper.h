@@ -37,4 +37,6 @@ Arrangement_2 polygon_to_arrangement(const Polygon_2& polygon);
 
 Arrangement_2 polygon_set_to_arrangement(const Polygon_set_2& polygon);
 
+Polygon_2 polygon_set_to_polygon(const Polygon_set_2& polygon_set);
+
 #endif //CONTIGUOUSARTGALLERY_HELPER_H

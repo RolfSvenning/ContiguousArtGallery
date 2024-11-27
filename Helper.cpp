@@ -71,6 +71,7 @@ Arrangement_2 polygon_to_arrangement(const Polygon_2& polygon) {
     return A;
 }
 
+
 Arrangement_2 polygon_set_to_arrangement(const Polygon_set_2& polygon_set) {
     // Check if the polygon set contains a single polygon
     if (polygon_set.is_empty()) {
@@ -115,7 +116,43 @@ Arrangement_2 polygon_set_to_arrangement(const Polygon_set_2& polygon_set) {
     return A;
 }
 
+Polygon_2 polygon_set_to_polygon(const Polygon_set_2& polygon_set) {
 
+    // Check if the polygon set contains a single polygon
+    if (polygon_set.is_empty()) {
+        std::cerr << "The polygon set is empty, can't be converted to a polygon" << std::endl;
+        throw std::invalid_argument("");
+    }
+    if (polygon_set.number_of_polygons_with_holes() != 1) {
+        std::cerr << "The polygon set contains more than one polygon, can't be converted to a polygon" << std::endl;
+        throw std::invalid_argument("");
+    }
+
+    // Extract the single polygon from the set
+    std::list<Polygon_with_holes_2> polygons;
+    polygon_set.polygons_with_holes(std::back_inserter(polygons));
+    const Polygon_with_holes_2& pwh = polygons.front();
+
+    // Ensure the polygon has no holes (i.e., it is a simple polygon)
+    if (!pwh.holes().empty()) {
+        std::cerr << "The polygon contains holes and is not simple, can't be converted to a polygon" << std::endl;
+        throw std::invalid_argument("");
+    }
+
+    // Get the outer boundary
+    const Polygon_2& outer_boundary = pwh.outer_boundary();
+
+    // Ensure the outer boundary is simple
+    if (!outer_boundary.is_simple()) {
+        std::cerr << "The outer boundary of the polygon is not simple, can't be converted to a polygon" << std::endl;
+        throw std::invalid_argument("");
+    }
+//    std::cout << "Converting polygon set to polygon 1" << std::endl;
+//    std::cout << outer_boundary.is_empty() << std::endl;
+//    std::cout << outer_boundary.edges_begin()->source() << std::endl;
+    return outer_boundary;
+
+}
 
 void printArrangementEdges(const Arrangement_2& A, const std::string& name) {
     std::cout << name << ": ";

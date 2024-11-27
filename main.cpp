@@ -7,16 +7,37 @@
 #include <iostream>
 #include <CGAL/Exact_rational.h>
 
-
 // Mine
+#include "Algorithm2.h"
 #include "Algorithm1.h"
 #include "Helper.h"
 
 
 
-int main( )
+void test() {
+    Segment s1 = Segment(Point(2,2), Point(3,3));
+    Segment s2 = Segment(Point(0,0), Point(1,1));
+
+    std::cout << "intersecting..." << std::endl;
+    const auto Ps = CGAL::intersection(s1, s2);
+    std::cout << "done" << std::endl;
+
+    if (Ps) {
+        if (const Segment* s = std::get_if<Segment>(&*Ps)) {
+            std::cout << "Segment: " << s->source() << ", " << s->target() << std::endl;
+        } else {
+            const Point* p = std::get_if<Point >(&*Ps);
+            std::cout << "Point: " << *p << std::endl;
+        }
+    }
+}
+
+
+int main()
 {
-    long T = 5;
+
+
+    long T = 10;
 
     //create polygon
     std::vector<Point> points = {Point(0,0), Point(5,-1), Point(4,0), Point(8,-2), Point(8,2), Point(4, 1), Point(6, 4),
@@ -35,6 +56,7 @@ int main( )
 
     Polygon_2 P = arrangement_to_polygon(A);
 
+//    test();
     algorithm1(T, A);
 
     return 1;
