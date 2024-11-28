@@ -30,7 +30,7 @@ void writeOutput(const std::string& filename, int i, int j, const Arrangement_2&
 
     for (int k = 0; k < Gs.size(); k++) {
         output << std::endl << "Guard " << k << " at: " << Gs[k] << " with chain interval: "
-               << Cs[k] << " " << Cs[(k + 1) % Gs.size()]
+               << Cs[2 * k] << " " << Cs[2 * k + 1]
                << " and visibility polygon vertices: ";
         for (const auto& v : VPs[k]) {
             output << v << " ";

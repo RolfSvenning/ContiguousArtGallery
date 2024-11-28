@@ -40,11 +40,12 @@ void algorithm1(long T, const Arrangement_2& A){
     for (j = 0; j < A.number_of_vertices(); j++) {
         std::optional<Point> start = (j != 0 ? std::optional<Point>(repetitionPoint) : std::nullopt);
         auto [guard, e_new, p_new, isFinished] =  greedyStep(A, e, p, start); // skip first step where p == start
-        p = p_new;
-        e = e_new;
 
         Gs.emplace_back(guard);
         Cs.emplace_back(p);
+        Cs.emplace_back(p_new);
+        p = p_new;
+        e = e_new;
         VPs.emplace_back(getVerticesOfArrangement(computeVisibilityArrangementGeneral(A, guard)));
 
         std::cout << "GREEDY STEP " << j << " COMPLETED FOR SOLUTION and ended at point: " << p << " and edge: " <<

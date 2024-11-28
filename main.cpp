@@ -70,11 +70,15 @@ int main(int argc, char* argv[]) {
     for (int k = 0; k < iterations; k++) {
         std::cout << "Iteration: " << k << std::endl;
         // TODO: set seed manually for it to work for small n
-        algorithm1(100 * n, polygon_to_arrangement(generate_random_polygon(n))); // seed 4242
+        algorithm1(100 * n, polygon_to_arrangement(generate_random_polygon(n, k + rand()))); // seed 4242, random: k + rand()
     }
+
 //    Polygon needing 3 guards: https://www.desmos.com/geometry/6iocdgnncv
 //    std::vector<Point> points = {Point(0,0), Point(5,-1), Point(4,0), Point(8,-2), Point(8,2), Point(4, 1), Point(6, 4),
 //                                     Point(10, 2), Point(8, 8), Point(4, 8), Point(6, 10), Point(0, 10), Point(0, 6), Point(8, 6)};
+
+    // Polygon needing 2 guards: https://www.desmos.com/geometry/ekruamhxwc
+//    std::vector<Point> points = {Point(0,0), Point(3, 2), Point(4, 0), Point(4 ,5), Point(1, 2), Point(0, 4)};
 //
 //    std::vector<Segment> segments;
 //    for (int i = 0; i < points.size(); i++) {
@@ -84,7 +88,7 @@ int main(int argc, char* argv[]) {
 //    Arrangement_2 A;
 //    CGAL::insert_non_intersecting_curves(A,segments.begin(),segments.end());
 //
-//    algorithm1(T, A);
+//    algorithm1(100 * n, A);
 
     return 1;
 }
