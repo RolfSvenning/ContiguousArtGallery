@@ -90,7 +90,7 @@ std::vector<Point> findAllIntersectionsBetweenEdgesOfPolygons(const Polygon_2& P
     return I;
 }
 
-bool passedStart(const Halfedge_circulator e, const std::optional<Point> start, const Point p) {
+bool passedStart(const Halfedge_circulator e, const std::optional<Point>& start, const Point p) {
     if (start.has_value() and pointIsOnEdgeButNotSource(start.value(), e)){
         // check if 'p' is closer than 'start' to 'e''s target
         if (CGAL::squared_distance(p, e->target()->point()) <= CGAL::squared_distance(start.value(), e->target()->point())){
@@ -101,7 +101,7 @@ bool passedStart(const Halfedge_circulator e, const std::optional<Point> start, 
     return false;
 }
 
-std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement_2& A, Halfedge_circulator e, Point p, const std::optional<Point> start) {
+std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement_2& A, Halfedge_circulator e, Point p, const std::optional<Point>& start) {
     std::cout << "Greedy step from p: " << p << std::endl;
     std::cout << "e: " << e->source()->point() << " -> " << e->target()->point() << std::endl;
     bool isFinished = false;
@@ -144,7 +144,7 @@ std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement
 
         } else {
             // F is a polygon
-            drawArrangements(A, polygon_set_to_arrangement(F));
+//            drawArrangements(A, polygon_set_to_arrangement(F));
             if (F.do_intersect(VP)) {
                 F.intersection(VP);
             } else {
@@ -160,7 +160,7 @@ std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement
                     std::cout << "Should never happen since at least two endpoints will be at the intersection" << std::endl;
                     throw std::invalid_argument("");
                 } else {
-                    for (auto pI: I) {
+                    for (const auto& pI: I) {
                         if (I[0] != pI) {
                             std::cout << "ERROR: for general position input all intersections should be at a single point" << std::endl;
                             throw std::invalid_argument("");
@@ -183,8 +183,7 @@ std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement
 
     // If greedyStep can traverse the entire polygon boundary then it is trivially solved by one guard
     if (i == A.number_of_vertices() + 2){
-        std :: cout << "Trivially solved by one guard << std::endl";
-        throw std::invalid_argument("");
+        return std::make_tuple(p, e, p, true);
         }
 
     // #===============================================#
@@ -208,9 +207,9 @@ std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement
         FA = polygon_set_to_arrangement(F);
         guard = FA.vertices_begin()->point();
     }
-    drawArrangements(A, FA);
+//    drawArrangements(A, FA);
 
-    // loop over vertices of FA and compute the visibility polygon of each vertex 'f' to find point furthest on 'e'
+    // loop over vertices of FA and compute the visibility polygon of each vertex 'f' to find the point furthest on 'e'
     for (auto vit = FA.vertices_begin(); vit != FA.vertices_end(); ++vit) {
         Point f = vit->point();
         Arrangement_2 VP_f;

@@ -21,9 +21,15 @@ typedef Arrangement_2::Ccb_halfedge_const_circulator        Halfedge_circulator;
 typedef Arrangement_2::Halfedge_const_handle                Halfedge_const_handle;
 
 
+bool isInGeneralPosition(const Arrangement_2 & A);
+
+void writeOutput(const std::string& filename, int i, int j, const Arrangement_2& A, const std::vector<Point>& Gs, const std::vector<Point>& Cs, const std::vector<std::vector<Point>>& VPs, bool verbose = false);
+
 void printArrangementEdges(const Arrangement_2& P, const std::string& name);
 
 std::vector<Halfedge_circulator> getEdgesOfArrangement(const Arrangement_2& P);
+
+std::vector<Point> getVerticesOfArrangement(const Arrangement_2& P);
 
 void drawArrangements(const Arrangement_2& A1, const Arrangement_2& A2);
 

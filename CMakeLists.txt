@@ -11,7 +11,9 @@ add_executable(main main.cpp Algorithm1.cpp
         "Algorithm2.cpp"
         "Algorithm2.h"
         Helper.cpp
-        Helper.h)
+        Helper.h
+        Conversions.cpp
+        Conversions.h)
 target_link_libraries(main PRIVATE CGAL::CGAL) # needed on windows
 
 

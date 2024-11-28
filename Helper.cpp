@@ -3,6 +3,59 @@
 
 
 
+
+
+bool isInGeneralPosition(const Arrangement_2 & A) {
+    std::vector<Point> Ps = getVerticesOfArrangement(A);
+    int n = Ps.size();
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            for (int k = j + 1; k < n; ++k) {
+                if (CGAL::collinear(Ps[i], Ps[j], Ps[k])) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+void writeOutput(const std::string& filename, int i, int j, const Arrangement_2& A, const std::vector<Point>& Gs, const std::vector<Point>& Cs, const std::vector<std::vector<Point>>& VPs, bool verbose) {
+    std::ostringstream output;
+    output << "Found solution with " << j + 1 << " guards in " << i + j + 2 << " greedy steps (input in general position: " << isInGeneralPosition(A) << ")" << std::endl;
+    output << "Vertices of the arrangement: ";
+    for (const auto& v : getVerticesOfArrangement(A)) {
+        output << v << " ";
+    }
+
+    for (int k = 0; k < Gs.size(); k++) {
+        output << std::endl << "Guard " << k << " at: " << Gs[k] << " with chain interval: "
+               << Cs[k] << " " << Cs[(k + 1) % Gs.size()]
+               << " and visibility polygon vertices: ";
+        for (const auto& v : VPs[k]) {
+            output << v << " ";
+        }
+    }
+
+    output << std::endl << std::endl;
+
+    if (verbose) {
+        std::cout << output.str();
+        std::cout << "Found solution with " << j + 1 << " guards in " << i + j + 2
+                  << " greedy steps (input in general position: " << isInGeneralPosition(A) << ")" << std::endl
+                  << std::endl;
+    }
+
+    std::ofstream file(filename, std::ios::app);
+    if (!file) {
+        std::cerr << "Error: Unable to open file " << filename << std::endl;
+        return;
+    }
+    file << output.str();
+    file.close();
+}
+
+
 // function that returns outer cbb for Polygon P
 // connected component of the boundary (CCB)
 // see: https://doc.cgal.org/latest/Arrangement_on_surface_2/index.html#fig__aos_fig-arr_segs
@@ -38,6 +91,15 @@ std::vector<Halfedge_circulator> getEdgesOfArrangement(const Arrangement_2& P) {
 
     return E;
 }
+
+std::vector<Point> getVerticesOfArrangement(const Arrangement_2& P) {
+    std::vector<Point> V;
+    for (auto e : getEdgesOfArrangement(P)) {
+        V.emplace_back(e->source()->point());
+    }
+    return V;
+}
+
 
 // Function to convert arrangement (Polygon) to Polygon_2
 Polygon_2 arrangement_to_polygon(const Arrangement_2& A) {
