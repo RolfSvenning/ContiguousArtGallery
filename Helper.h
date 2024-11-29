@@ -23,7 +23,7 @@ typedef Arrangement_2::Halfedge_const_handle                Halfedge_const_handl
 
 bool isInGeneralPosition(const Arrangement_2 & A);
 
-void writeOutput(const std::string& filename, int i, int j, const Arrangement_2& A, const std::vector<Point>& Gs, const std::vector<Point>& Cs, const std::vector<std::vector<Point>>& VPs, bool verbose = false);
+void writeOutput(const std::string& filename, int i, int j, const Arrangement_2& A, const std::vector<Point>& Gs, const std::vector<Point>& Cs, const std::vector<std::vector<Point>>& VPs, Point pStart, bool verbose = false);
 
 void printArrangementEdges(const Arrangement_2& P, const std::string& name);
 

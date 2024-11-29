@@ -74,7 +74,7 @@ std::vector<Point> findAllIntersectionsBetweenEdgesOfPolygons(const Polygon_2& P
             auto intersection = CGAL::intersection(eP, eQ);
 
             if (intersection) {
-                std::cout << "Intersection found" << std::endl;
+//                std::cout << "Intersection found" << std::endl;
                 if (const Point *pI = std::get_if<Point>(&*intersection)) {
                     I.push_back(*pI);
                 } else if (const Segment *sI = std::get_if<Segment>(&*intersection)) {
@@ -94,7 +94,7 @@ bool passedStart(const Halfedge_circulator e, const std::optional<Point>& start,
     if (start.has_value() and pointIsOnEdgeButNotSource(start.value(), e)){
         // check if 'p' is closer than 'start' to 'e''s target
         if (CGAL::squared_distance(p, e->target()->point()) <= CGAL::squared_distance(start.value(), e->target()->point())){
-            std::cout << "Found a solution" << std::endl;
+//            std::cout << "Found a solution" << std::endl;
             return true;
         }
     }
@@ -102,8 +102,8 @@ bool passedStart(const Halfedge_circulator e, const std::optional<Point>& start,
 }
 
 std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement_2& A, Halfedge_circulator e, Point p, const std::optional<Point>& start) {
-    std::cout << "Greedy step from p: " << p << std::endl;
-    std::cout << "e: " << e->source()->point() << " -> " << e->target()->point() << std::endl;
+//    std::cout << "Greedy step from p: " << p << std::endl;
+//    std::cout << "e: " << e->source()->point() << " -> " << e->target()->point() << std::endl;
     bool isFinished = false;
 
     // Compute the initial feasible polygon set
@@ -123,17 +123,17 @@ std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement
     int i = 0;
     for (; i < A.number_of_vertices() + 2; i++){
         p = e->target()->point();
-        std :: cout << "Greedy step now at p: " << p << " for edge: " << e->source()->point() << " -> " << e->target()->point() << std::endl;
+//        std :: cout << "Greedy step now at p: " << p << " for edge: " << e->source()->point() << " -> " << e->target()->point() << std::endl;
 
         Polygon_2 VP = arrangement_to_polygon(computeVisibilityArrangementAtEdge(A, p, e));
 
         if (not Fs.empty()) {
-            std::cout << "F is a single point" << std::endl;
+//            std::cout << "F is a single point" << std::endl;
             if (size(Fs) == 1) {
                 // Fs is a point, check if it is in VP (including its boundary)
                 if (VP.has_on_unbounded_side(Fs[0])) {
-                    std::cout << "Fs is not in VP" << std::endl;
-                    std::cout << "Fs: " << Fs[0] << std::endl;
+//                    std::cout << "Fs is not in VP" << std::endl;
+//                    std::cout << "Fs: " << Fs[0] << std::endl;
                     break;
                 }
             } else {
@@ -149,10 +149,10 @@ std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement
                 F.intersection(VP);
             } else {
                 // also check if F and VP intersect at their boundary (i.e., if they share a point or a segment)
-                std::cout << "Checking if F and VP intersect at their boundary" << std::endl;
+//                std::cout << "Checking if F and VP intersect at their boundary" << std::endl;
                 auto FP = polygon_set_to_polygon(F);
                 std::vector<Point> I = findAllIntersectionsBetweenEdgesOfPolygons(FP, VP);
-                std::cout << "#intersections: " << size(I) << std::endl;
+//                std::cout << "#intersections: " << size(I) << std::endl;
 
                 if (size(I) == 0) {
                     break;
@@ -192,7 +192,7 @@ std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement
 
     Point pFirst = e->source()->point();
     Point pBest = e->source()->point();
-    std::cout << "Greedy step (FINAL EDGE) at pBest: " << pBest << " on edge: " << pFirst << " -> " << e->target()->point() << std::endl;
+//    std::cout << "Greedy step (FINAL EDGE) at pBest: " << pBest << " on edge: " << pFirst << " -> " << e->target()->point() << std::endl;
 
     Arrangement_2 FA;
     Point guard;
@@ -215,20 +215,20 @@ std::tuple<Point, Halfedge_circulator, Point, bool> greedyStep(const Arrangement
         Arrangement_2 VP_f;
         VP_f = computeVisibilityArrangementGeneral(A, f);
 
-        std::cout << "edge e is: " << e->source()->point() << " -> " << e->target()->point() << std::endl;
+//        std::cout << "edge e is: " << e->source()->point() << " -> " << e->target()->point() << std::endl;
 
         // loop over vertices of visibility polygon
         for (auto vit2 = VP_f.vertices_begin(); vit2 != VP_f.vertices_end(); ++vit2) {
             Point q = vit2->point();
             if (pointIsOnEdgeButNotSource(q, e)) {
-                std::cout << "Point q: " << q << " is on edge e: " << e->source()->point() << " -> "
-                          << e->target()->point() << std::endl;
+//                std::cout << "Point q: " << q << " is on edge e: " << e->source()->point() << " -> "
+//                          << e->target()->point() << std::endl;
                 // Check if vertex is further than pBest
                 if (CGAL::squared_distance(pFirst, q) > CGAL::squared_distance(pFirst, pBest)) {
-                    std::cout << "Found a better point: (" << q << ") at distance: "
-                              << CGAL::squared_distance(pFirst, q) << std::endl;
-                    std::cout << "Previous best point: (" << pBest << ") at distance: "
-                              << CGAL::squared_distance(pFirst, pBest) << std::endl;
+//                    std::cout << "Found a better point: (" << q << ") at distance: "
+//                              << CGAL::squared_distance(pFirst, q) << std::endl;
+//                    std::cout << "Previous best point: (" << pBest << ") at distance: "
+//                              << CGAL::squared_distance(pFirst, pBest) << std::endl;
                     pBest = q;
                     guard = f;
                 }

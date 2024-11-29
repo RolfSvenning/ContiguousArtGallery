@@ -20,9 +20,9 @@ bool isInGeneralPosition(const Arrangement_2 & A) {
     return true;
 }
 
-void writeOutput(const std::string& filename, int i, int j, const Arrangement_2& A, const std::vector<Point>& Gs, const std::vector<Point>& Cs, const std::vector<std::vector<Point>>& VPs, bool verbose) {
+void writeOutput(const std::string& filename, int i, int j, const Arrangement_2& A, const std::vector<Point>& Gs, const std::vector<Point>& Cs, const std::vector<std::vector<Point>>& VPs, Point pStart, bool verbose) {
     std::ostringstream output;
-    output << "Found solution with " << j + 1 << " guards in " << i + j + 2 << " greedy steps (input in general position: " << isInGeneralPosition(A) << ")" << std::endl;
+    output << "Found solution with " << j + 1 << " guards in " << i + j + 2 << " greedy steps from pStart: " << pStart<< " (input in general position: " << isInGeneralPosition(A) << ")" << std::endl;
     output << "Vertices of the arrangement: ";
     for (const auto& v : getVerticesOfArrangement(A)) {
         output << v << " ";
@@ -40,7 +40,7 @@ void writeOutput(const std::string& filename, int i, int j, const Arrangement_2&
     output << std::endl << std::endl;
 
     if (verbose) {
-        std::cout << output.str();
+//        std::cout << output.str();
         std::cout << "Found solution with " << j + 1 << " guards in " << i + j + 2
                   << " greedy steps (input in general position: " << isInGeneralPosition(A) << ")" << std::endl
                   << std::endl;

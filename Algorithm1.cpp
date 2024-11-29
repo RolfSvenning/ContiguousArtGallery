@@ -4,11 +4,12 @@
 
 
 void algorithm1(long T, const Arrangement_2& A){
-    std::cout << "Algorithm 1 running" << std::endl;
+//    std::cout << "Algorithm 1 running" << std::endl;
 
     // get the first edge and point
     Halfedge_circulator e = getEdgesOfArrangement(A)[1];
     Point p = CGAL::midpoint(e->source()->point(), e->target()->point());
+    Point pStart = p;
     std::set<Point> S;
     S.insert(p);
     Point repetitionPoint;
@@ -18,16 +19,16 @@ void algorithm1(long T, const Arrangement_2& A){
     for (i = 0; i < T; i++){
         auto [guard, e_new, p_new, isFinished] =  greedyStep(A, e, p);
         if (isFinished) { // isFinished is otherwise used to check if the start point is passed, this is a hack
-            std :: cout << "Trivially solved by one guard << std::endl";
+//            std :: cout << "Trivially solved by one guard << std::endl";
             return;
         }
         p = p_new;
         e = e_new;
-        std::cout << "GREEDY STEP " << i << " COMPLETED and ended at point: " << p << " and edge: " <<
-                  e->source()->point() << " -> " << e->target()->point() << " with guard at: " << guard << std::endl;
+//        std::cout << "GREEDY STEP " << i << " COMPLETED and ended at point: " << p << " and edge: " <<
+//                  e->source()->point() << " -> " << e->target()->point() << " with guard at: " << guard << std::endl;
         // if p in S then do one final round until you p again
         if (S.contains(p)){
-            std::cout << "Found repetition with point p: " << p << " after i = " << i << " greedy steps" << std::endl;
+//            std::cout << "Found repetition with point p: " << p << " after i = " << i << " greedy steps" << std::endl;
             repetitionPoint = p;
             break;
         }
@@ -48,15 +49,15 @@ void algorithm1(long T, const Arrangement_2& A){
         e = e_new;
         VPs.emplace_back(getVerticesOfArrangement(computeVisibilityArrangementGeneral(A, guard)));
 
-        std::cout << "GREEDY STEP " << j << " COMPLETED FOR SOLUTION and ended at point: " << p << " and edge: " <<
-                  e->source()->point() << " -> " << e->target()->point() << " with guard at: " << guard << std::endl;
+//        std::cout << "GREEDY STEP " << j << " COMPLETED FOR SOLUTION and ended at point: " << p << " and edge: " <<
+//                  e->source()->point() << " -> " << e->target()->point() << " with guard at: " << guard << std::endl;
         if (isFinished) {
-            std::cout << "Minimum number of guards: " << j + 1 << std::endl;
+//            std::cout << "Minimum number of guards: " << j + 1 << std::endl;
             break;
         }
     }
     // TODO: also add seed
-    writeOutput("../Data/Global/results.txt", i, j, A, Gs, Cs, VPs, true);
+    writeOutput("../Data/Global/results.txt", i, j, A, Gs, Cs, VPs, pStart, true);
 }
 
 
