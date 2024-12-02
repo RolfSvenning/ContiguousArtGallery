@@ -7,6 +7,12 @@
 #include <iostream>
 #include <cstdlib> // For std::atoi
 
+// For error in CGAL
+#include <thread>
+#include <future>
+#include <vector>
+#include <chrono>
+#include <stdexcept>
 
 // Mine
 #include "Algorithm2.h"
@@ -20,23 +26,46 @@
 typedef CGAL::Creator_uniform_2<double, Point> PointCreator;
 typedef CGAL::Random_points_in_square_2<Point, PointCreator> Point_generator;
 
-void test() {
-    Segment s1 = Segment(Point(2,2), Point(3,3));
-    Segment s2 = Segment(Point(0,0), Point(1,1));
-
-    std::cout << "intersecting..." << std::endl;
-    const auto Ps = CGAL::intersection(s1, s2);
-    std::cout << "done" << std::endl;
-
-    if (Ps) {
-        if (const Segment* s = std::get_if<Segment>(&*Ps)) {
-            std::cout << "Segment: " << s->source() << ", " << s->target() << std::endl;
-        } else {
-            const Point* p = std::get_if<Point >(&*Ps);
-            std::cout << "Point: " << *p << std::endl;
-        }
-    }
-}
+//bool tryRandomPolygon(const std::vector<Point>& points, Polygon_2& P) {
+//    CGAL::random_polygon_2(points.size(), std::back_inserter(P), points.begin());
+//    return true;
+//}
+//
+//Polygon_2 generate_random_polygonNEW(int n, std::optional<int> seed = std::nullopt) {
+//    Polygon_2 P;
+//    std::vector<Point> points;
+//    CGAL::Random rand;
+//
+//    for (int i = 0; i < 10; ++i) {
+//        std::cout << "Attempt: " << i << std::endl;
+//        if (seed.has_value()) {
+//            std::cout << "has seed" << std::endl;
+//            rand = CGAL::Random(seed.value() + i);
+//        }
+//
+//        points.clear();
+//        P.clear();
+//
+//        // Generate unique points
+//        CGAL::copy_n_unique(Point_generator(1000, rand), n, std::back_inserter(points));
+//
+//        // Run random_polygon_2 with a timeout
+//        auto future = std::async(std::launch::async, tryRandomPolygon, std::cref(points), std::ref(P));
+//
+//        if (future.wait_for(std::chrono::seconds(10)) == std::future_status::ready) {
+//            if (future.get()) {
+//                std::cout << "Random polygon generated successfully on attempt " << i << "." << std::endl;
+//                return P; // Return the polygon if successful
+//            }
+//        } else {
+//            std::cout << "Timeout reached on attempt " << i << std::endl;
+//        }
+//        std::cout << "Attempt " << i << " failed" << std::endl;
+//    }
+//    std::cout << "Failed to generate random polygon for unknown reasons (bug in CGAL function 'random_polygon_2')" << std::endl;
+//    throw std::invalid_argument("");
+//    return P;
+//}
 
 
 Polygon_2 generate_random_polygon(int n, std::optional<int> seed = std::nullopt) {
@@ -46,10 +75,12 @@ Polygon_2 generate_random_polygon(int n, std::optional<int> seed = std::nullopt)
     if (seed.has_value()) {
         rand = CGAL::Random(seed.value());
     }
-    std::cout << "Generating random polygon with seed: " << rand.get_seed() << std::endl;
+//    std::cout << "Generating random polygon 1" << std::endl;
 
     CGAL::copy_n_unique(Point_generator(1000, rand), n, std::back_inserter(points));
     CGAL::random_polygon_2(points.size(), std::back_inserter(P), points.begin());
+
+//    std :: cout << "Generating random polygon 3" << std::endl;
 
     return P;
 }
@@ -66,11 +97,11 @@ int main(int argc, char* argv[]) {
     int n = std::atoi(argv[2]);
 
     // Print the parsed values
-    std::cout << "Running with " << iterations << " iterations and n = " << n << "." << std::endl;
+//    std::cout << "Running with " << iterations << " iterations and n = " << n << "." << std::endl;
     for (int k = 0; k < iterations; k++) {
-        std::cout << "Iteration: " << k << std::endl;
+//        std::cout << "Iteration: " << k << std::endl;
         // TODO: set seed manually for it to work for small n
-        algorithm1(100 * n, polygon_to_arrangement(generate_random_polygon(n, k + rand()))); // seed 4242, random: k + rand()
+        algorithm1(100 * n, polygon_to_arrangement(generate_random_polygon(n, k + rand()))); // spicy seed 404578271
     }
 
 //    Polygon needing 3 guards: https://www.desmos.com/geometry/6iocdgnncv
