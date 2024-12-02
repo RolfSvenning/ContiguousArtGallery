@@ -6,3 +6,9 @@ for guard in range(3, 7):
     print("Guards: ", guard)
     for steps in range(2 * guard + 1, 4 * guard):
         print(steps, ": ", sum(1 for g, s in I if g == guard and s == steps))
+
+
+for guard in range(3, 7):
+    Ig = [s for g, s in I if g == guard]
+    print("Maximum steps for ", guard, " guards: ", max(Ig))
+

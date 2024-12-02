@@ -6,6 +6,7 @@ CGAL-6.0.1/
 .idea/
 cmake-build-vcpkg/
 Data/Local/
+Data/Global/results.txt
 
 # Prerequisites
 *.d
