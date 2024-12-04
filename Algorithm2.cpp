@@ -17,13 +17,17 @@ typedef Arrangement_2::Face_const_handle                                    Face
 
 Arrangement_2 computeVisibilityArrangementAtEdge(const Arrangement_2 & A, const Point& p, Halfedge_const_handle e) {
     // Assert point p on edge e or throw error
-    validatePointOnEdge(p, e);
+//    validatePointOnEdge(p, e);
 
+    // point most not be source, throw error
+    if (not pointIsOnEdgeButNotSource(p, e)) {
+        std::cout << "ERROR: p must be on edge e" << std::endl;
+        throw std::logic_error("");
+    }
     // Compute the visibility polygon
     Arrangement_2 VA;
     VA_type VP_calculator(A);
     VP_calculator.compute_visibility(p, e, VA);
-
     return VA;
 }
 

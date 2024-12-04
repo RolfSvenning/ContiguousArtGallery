@@ -8,7 +8,8 @@ void algorithm1(long T, const Arrangement_2& A){
 
     // get the first edge and point
     Halfedge_circulator e = getEdgesOfArrangement(A)[1];
-    Point p = CGAL::midpoint(e->source()->point(), e->target()->point());
+//    Point p = CGAL::midpoint(e->source()->point(), e->target()->point());
+    Point p = e -> target() -> point();
     Point pStart = p;
     std::set<Point> S;
     S.insert(p);
