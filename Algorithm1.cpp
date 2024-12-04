@@ -15,6 +15,10 @@ void algorithm1(long T, const Arrangement_2& A){
     Point repetitionPoint;
     int i, j;
 
+    std::vector<Point> Gs;
+    std::vector<Point> Cs;
+    std::vector<std::vector<Point>> VPs;
+
     // for-loop over T
     for (i = 0; i < T; i++){
         auto [guard, e_new, p_new, isFinished] =  greedyStep(A, e, p);
@@ -22,8 +26,12 @@ void algorithm1(long T, const Arrangement_2& A){
 //            std :: cout << "Trivially solved by one guard << std::endl";
             return;
         }
+        Gs.emplace_back(guard);
+        Cs.emplace_back(p);
+        Cs.emplace_back(p_new);
         p = p_new;
         e = e_new;
+        VPs.emplace_back(getVerticesOfArrangement(computeVisibilityArrangementGeneral(A, guard)));
 //        std::cout << "GREEDY STEP " << i << " COMPLETED and ended at point: " << p << " and edge: " <<
 //                  e->source()->point() << " -> " << e->target()->point() << " with guard at: " << guard << std::endl;
         // if p in S then do one final round until you p again
@@ -35,9 +43,11 @@ void algorithm1(long T, const Arrangement_2& A){
         S.insert(p);
     }
 
-    std::vector<Point> Gs;
-    std::vector<Point> Cs;
-    std::vector<std::vector<Point>> VPs;
+
+
+//    std::vector<Point> Gs;
+//    std::vector<Point> Cs;
+//    std::vector<std::vector<Point>> VPs;
     for (j = 0; j < A.number_of_vertices(); j++) {
         std::optional<Point> start = (j != 0 ? std::optional<Point>(repetitionPoint) : std::nullopt);
         auto [guard, e_new, p_new, isFinished] =  greedyStep(A, e, p, start); // skip first step where p == start
@@ -57,7 +67,7 @@ void algorithm1(long T, const Arrangement_2& A){
         }
     }
     // TODO: also add seed
-    writeOutput("../Data/Global/results.txt", i, j, A, Gs, Cs, VPs, pStart, true);
+    writeOutput("../Data/Local/results2.txt", i, j, A, Gs, Cs, VPs, pStart, true);
 }
 
 
