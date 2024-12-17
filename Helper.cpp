@@ -101,7 +101,7 @@ bool isInGeneralPosition(const Arrangement_2 & A) {
     return true;
 }
 
-void writeOutput(const std::string& filename, int i, int j, const Arrangement_2& A, const std::vector<Point>& Gs, const std::vector<Point>& Cs, const std::vector<std::vector<Point>>& VPs, Point pStart, bool verbose) {
+void writeOutput(const std::string& filename, int i, int j, const Arrangement_2& A, const std::vector<Point>& Gs, const std::vector<Point>& Ps, const std::vector<std::vector<Point>>& VPs, Point pStart, bool verbose) {
     std::ostringstream output;
     output << "Found solution with " << j + 1 << " guards in " << i + 1 + j + (j > 0) << " greedy steps from pStart: " << pStart<< " (input in general position: " << isInGeneralPosition(A) << ")" << std::endl;
     output << "Vertices of the polygon: ";
@@ -111,7 +111,7 @@ void writeOutput(const std::string& filename, int i, int j, const Arrangement_2&
 
     for (int k = 0; k < Gs.size(); k++) {
         output << std::endl << "Guard " << k << " at: " << Gs[k] << " with chain interval: "
-               << Cs[2 * k] << " " << Cs[2 * k + 1]
+               << Ps[2 * k] << " " << Ps[2 * k + 1]
                << " and visibility polygon vertices: ";
         for (const auto& v : VPs[k]) {
             output << v << " ";
