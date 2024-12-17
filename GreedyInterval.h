@@ -19,12 +19,12 @@
 //// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 //// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef CONTIGUOUSARTGALLERY_ALGORITHM1_H
-#define CONTIGUOUSARTGALLERY_ALGORITHM1_H
+#ifndef CONTIGUOUSARTGALLERY_GREEDYINTERVAL_H
+#define CONTIGUOUSARTGALLERY_GREEDYINTERVAL_H
 
-#include "GreedyInterval.h"
+#include "Helper.h"
 
-void algorithm1(long T, const Arrangement_2& P);
+std::tuple<Point, Halfedge_circulator, Point, bool> greedyInterval(const Arrangement_2&, Halfedge_circulator e, Point p, const std::optional<Point>& start = std::nullopt);
 
 #endif
 

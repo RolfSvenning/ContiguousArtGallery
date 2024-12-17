@@ -1,9 +1,90 @@
+//// Copyright (c) 2024 Rolf Svenning
+////
+//// Permission is hereby granted, free of charge, to any person obtaining a
+//// copy of this software and associated documentation files (the
+//// "Software"), to deal in the Software without restriction, including
+//// without limitation the rights (to use, copy, modify, merge, publish,
+//// distribute, sublicense, and/or sell copies of the Software, and to
+//// permit persons to whom the Software is furnished to do so, subject to
+//// the following conditions:
+////
+//// The above copyright notice and this permission notice shall be included
+//// in all copies or substantial portions of the Software.
+////
+//// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+//// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+//// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+//// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+//// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+//// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+//// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 #include "Helper.h"
 #include <CGAL/Polygon_2.h>
+//#include <CGAL/draw_arrangement_2.h>
 
 
+Arrangement_2 computeVisibilityArrangementAtEdge(const Arrangement_2 & A, const Point& p, Halfedge_const_handle e) {
+    Arrangement_2 VA;
+    VA_type VP_calculator(A);
+    VP_calculator.compute_visibility(p, e, VA);
+    return VA;
+}
+
+Arrangement_2 computeVisibilityArrangementAtFace(const Arrangement_2 & A, const Point& p) {
+    Face_const_handle f;
+    if (A.edges_begin()->face()->is_unbounded()){
+        f = A.edges_begin()->twin()->face();
+    }
+    else {
+        f = A.edges_begin()->face();
+    }
+
+    Arrangement_2 VA;
+    VP_type_non_regular_face VP_calculator(A);
+    VP_calculator.compute_visibility(p, f, VA);
+
+    return VA;
+}
+
+Arrangement_2 computeVisibilityArrangementGeneral(const Arrangement_2& A, const Point& p) {
+    Arrangement_2 VP;
+
+    for (auto eA: getEdgesOfArrangement(A)) {
+        if (pointIsOnEdgeButNotSource(p, eA)) {
+            VP = computeVisibilityArrangementAtEdge(A, p, eA);
+            break;
+        }
+    }
+
+    if (VP.is_empty()) {
+        VP = computeVisibilityArrangementAtFace(A, p);
+    }
+    return VP;
+}
 
 
+std::vector<Point> findAllIntersectionsBetweenEdgesOfPolygons(const Polygon_2& P, const Polygon_2& Q){
+    std::vector<Point> I;
+    for (auto eP: P.edges()) {
+        for (auto eQ: Q.edges()) {
+            auto intersection = CGAL::intersection(eP, eQ);
+            if (intersection) {
+                const Point *pI = std::get_if<Point>(&*intersection);
+                I.push_back(*pI);
+            }
+        }
+    }
+    return I;
+}
+
+bool passedStart(const Halfedge_circulator e, const std::optional<Point>& start, const Point p) {
+    if (start.has_value() and pointIsOnEdgeButNotSource(start.value(), e)){
+        // check if 'p' is closer than 'start' to 'e''s target
+        return CGAL::squared_distance(p, e->target()->point()) <= CGAL::squared_distance(start.value(), e->target()->point());
+    }
+    return false;
+}
 
 bool isInGeneralPosition(const Arrangement_2 & A) {
     std::vector<Point> Ps = getVerticesOfArrangement(A);
@@ -22,8 +103,8 @@ bool isInGeneralPosition(const Arrangement_2 & A) {
 
 void writeOutput(const std::string& filename, int i, int j, const Arrangement_2& A, const std::vector<Point>& Gs, const std::vector<Point>& Cs, const std::vector<std::vector<Point>>& VPs, Point pStart, bool verbose) {
     std::ostringstream output;
-    output << "Found solution with " << j + 1 << " guards in " << i + j + 2 << " greedy steps from pStart: " << pStart<< " (input in general position: " << isInGeneralPosition(A) << ")" << std::endl;
-    output << "Vertices of the arrangement: ";
+    output << "Found solution with " << j + 1 << " guards in " << i + 1 + j + (j > 0) << " greedy steps from pStart: " << pStart<< " (input in general position: " << isInGeneralPosition(A) << ")" << std::endl;
+    output << "Vertices of the polygon: ";
     for (const auto& v : getVerticesOfArrangement(A)) {
         output << v << " ";
     }
@@ -40,8 +121,7 @@ void writeOutput(const std::string& filename, int i, int j, const Arrangement_2&
     output << std::endl << std::endl;
 
     if (verbose) {
-//        std::cout << output.str();
-        std::cout << "Found solution with " << j + 1 << " guards in " << i + j + 2
+        std::cout << "Found solution with " << j + 1 << " guards in " << i + 1 + j + (j > 0)
                   << " greedy steps (input in general position: " << isInGeneralPosition(A) << ")" << std::endl
                   << std::endl;
     }
@@ -56,29 +136,10 @@ void writeOutput(const std::string& filename, int i, int j, const Arrangement_2&
 }
 
 
-// function that returns outer cbb for Polygon P
-// connected component of the boundary (CCB)
-// see: https://doc.cgal.org/latest/Arrangement_on_surface_2/index.html#fig__aos_fig-arr_segs
 std::vector<Halfedge_circulator> getEdgesOfArrangement(const Arrangement_2& P) {
-    // assert Euler's formula for planar graphs
-    if (not P.number_of_vertices() - P.number_of_edges() + P.number_of_faces() == 2) {
-        std::cerr << "Euler's formula for planar graphs is not satisfied" << std::endl;
-        throw std::invalid_argument("");
-    }
-
-    // assert number of faces is 2 else throw an error
-    if (P.number_of_faces() != 2) {
-        std::cerr << "The number of faces is not 2" << std::endl;
-        throw std::invalid_argument("");
-    }
-    // get the inner face
     auto face = P.faces_begin();
     if (face->is_unbounded()) {
         face++;
-    }
-    if (face->is_unbounded()) {
-        std::cerr << "Both faces are unbounded" << std::endl;
-        throw std::invalid_argument("");
     }
 
     std::vector<Halfedge_circulator> E;
@@ -101,7 +162,6 @@ std::vector<Point> getVerticesOfArrangement(const Arrangement_2& P) {
 }
 
 
-// Function to convert arrangement (Polygon) to Polygon_2
 Polygon_2 arrangement_to_polygon(const Arrangement_2& A) {
     Polygon_2 polygon;
 
@@ -115,19 +175,11 @@ Polygon_2 arrangement_to_polygon(const Arrangement_2& A) {
 Arrangement_2 polygon_to_arrangement(const Polygon_2& polygon) {
     Arrangement_2 A;
 
-    // Ensure the polygon is not empty
-    if (polygon.is_empty()) {
-        std::cerr << "The polygon is empty, can't be converted to an arrangement" << std::endl;
-        throw std::invalid_argument("The polygon is empty.");
-    }
-
-    // Iterate over the edges of the polygon and insert them into the arrangement
     std::vector<Segment> segments;
     for (auto it = polygon.edges_begin(); it != polygon.edges_end(); ++it) {
         segments.push_back(*it);
     }
 
-    // Insert the segments into the arrangement
     CGAL::insert_non_intersecting_curves(A, segments.begin(), segments.end());
 
     return A;
@@ -135,40 +187,12 @@ Arrangement_2 polygon_to_arrangement(const Polygon_2& polygon) {
 
 
 Arrangement_2 polygon_set_to_arrangement(const Polygon_set_2& polygon_set) {
-    // Check if the polygon set contains a single polygon
-    if (polygon_set.is_empty()) {
-        std::cerr << "The polygon set is empty, can't be converted to an arrangement" << std::endl;
-        throw std::invalid_argument("");
-    }
-    if (polygon_set.number_of_polygons_with_holes() != 1) {
-        std::cerr << "The polygon set contains more than one polygon, can't be converted to an arrangement" << std::endl;
-        throw std::invalid_argument("");
-    }
-
-    // Extract the single polygon from the set
     std::list<Polygon_with_holes_2> polygons;
     polygon_set.polygons_with_holes(std::back_inserter(polygons));
     const Polygon_with_holes_2& pwh = polygons.front();
-
-    // Ensure the polygon has no holes (i.e., it is a simple polygon)
-    if (!pwh.holes().empty()) {
-        std::cerr << "The polygon contains holes and is not simple, can't be converted to an arrangement" << std::endl;
-        throw std::invalid_argument("");
-    }
-
-    // Get the outer boundary
     const Polygon_2& outer_boundary = pwh.outer_boundary();
-
-    // Ensure the outer boundary is simple
-    if (!outer_boundary.is_simple()) {
-        std::cerr << "The outer boundary of the polygon is not simple, can't be converted to an arrangement" << std::endl;
-        throw std::invalid_argument("");
-    }
-
-    // Create an empty arrangement
     Arrangement_2 A;
 
-    // Insert the edges of the polygon into the arrangement
     std::vector<Segment> segments;
     for (auto it = outer_boundary.edges_begin(); it != outer_boundary.edges_end(); ++it) {
         segments.push_back(*it);
@@ -179,88 +203,17 @@ Arrangement_2 polygon_set_to_arrangement(const Polygon_set_2& polygon_set) {
 }
 
 Polygon_2 polygon_set_to_polygon(const Polygon_set_2& polygon_set) {
-
-    // Check if the polygon set contains a single polygon
-    if (polygon_set.is_empty()) {
-        std::cerr << "The polygon set is empty, can't be converted to a polygon" << std::endl;
-        throw std::invalid_argument("");
-    }
-    if (polygon_set.number_of_polygons_with_holes() != 1) {
-        std::cerr << "The polygon set contains more than one polygon, can't be converted to a polygon" << std::endl;
-        throw std::invalid_argument("");
-    }
-
-    // Extract the single polygon from the set
     std::list<Polygon_with_holes_2> polygons;
     polygon_set.polygons_with_holes(std::back_inserter(polygons));
     const Polygon_with_holes_2& pwh = polygons.front();
-
-    // Ensure the polygon has no holes (i.e., it is a simple polygon)
-    if (!pwh.holes().empty()) {
-        std::cerr << "The polygon contains holes and is not simple, can't be converted to a polygon" << std::endl;
-        throw std::invalid_argument("");
-    }
-
-    // Get the outer boundary
     const Polygon_2& outer_boundary = pwh.outer_boundary();
 
-    // Ensure the outer boundary is simple
-    if (!outer_boundary.is_simple()) {
-        std::cerr << "The outer boundary of the polygon is not simple, can't be converted to a polygon" << std::endl;
-        throw std::invalid_argument("");
-    }
-//    std::cout << "Converting polygon set to polygon 1" << std::endl;
-//    std::cout << outer_boundary.is_empty() << std::endl;
-//    std::cout << outer_boundary.edges_begin()->source() << std::endl;
     return outer_boundary;
 
 }
 
-void printArrangementEdges(const Arrangement_2& A, const std::string& name) {
-    std::cout << name << ": ";
-    std::vector<Halfedge_circulator > E = getEdgesOfArrangement(A);
-
-    // print the edges E of A
-    for (auto e : E) {
-        std::cout << "(" << e->source()->point() << " -> " << e->target()->point() << ") ";
-    }
-    std::cout << std::endl;
-}
-
-void validatePointOnEdge(const Point& p, Halfedge_circulator e) {
-    // Extract endpoints of the edge
-    const Point& source = e->source()->point();
-    const Point& target = e->target()->point();
-
-    // Allow p to be exactly the source or target of the edge
-    if (p == source || p == target) {
-        return; // Valid case, no exception
-    }
-
-    std::ostringstream oss;
-    // Check if p is collinear with the edge
-    if (!CGAL::collinear(source, target, p)) {
-        throw std::invalid_argument([&]() {
-            oss << "Point p (" << p << ") is not collinear with edge e defined by endpoints ("
-                << source << ") -> (" << target << ").";
-            return oss.str();
-        }());
-    }
-
-    // Check if point p is within the segment bounds
-    if (!(CGAL::compare(CGAL::min(source.x(), target.x()), p.x()) != CGAL::LARGER &&
-          CGAL::compare(CGAL::max(source.x(), target.x()), p.x()) != CGAL::SMALLER &&
-          CGAL::compare(CGAL::min(source.y(), target.y()), p.y()) != CGAL::LARGER &&
-          CGAL::compare(CGAL::max(source.y(), target.y()), p.y()) != CGAL::SMALLER)) {
-        std::ostringstream oss;
-        oss << "Point p (" << p << ") is collinear but not within the segment bounds of edge e with endpoints ("
-            << source << ") -> (" << target << ").";
-        throw std::invalid_argument(oss.str());
-    }
-}
 
 bool pointIsOnEdgeButNotSource(const Point& p, Halfedge_circulator e) {
-    // Extract endpoints of the edge
     const Point& source = e->source()->point();
     const Point& target = e->target()->point();
 
@@ -289,16 +242,18 @@ bool pointIsOnEdgeButNotSource(const Point& p, Halfedge_circulator e) {
     return true;
 }
 
-void drawArrangements(const Arrangement_2& A1, const Arrangement_2& A2) {
-    Arrangement_2 A_merged;
-    // Insert edges from the first arrangement
-    for (auto edge = A1.edges_begin(); edge != A1.edges_end(); ++edge) {
-        A_merged.insert_in_face_interior(Segment(edge->source()->point(), edge->target()->point()), A_merged.unbounded_face());
-    }
+//void drawArrangements(const Arrangement_2& A1, const Arrangement_2& A2) {
+//    Arrangement_2 A_merged;
+//    for (auto edge = A1.edges_begin(); edge != A1.edges_end(); ++edge) {
+//        A_merged.insert_in_face_interior(Segment(edge->source()->point(), edge->target()->point()), A_merged.unbounded_face());
+//    }
+//
+//    for (auto edge = A2.edges_begin(); edge != A2.edges_end(); ++edge) {
+//        A_merged.insert_in_face_interior(Segment(edge->source()->point(), edge->target()->point()), A_merged.unbounded_face());
+//    }
+//    CGAL::draw(A_merged);
+//}
 
-    // Insert edges from the second arrangement
-    for (auto edge = A2.edges_begin(); edge != A2.edges_end(); ++edge) {
-        A_merged.insert_in_face_interior(Segment(edge->source()->point(), edge->target()->point()), A_merged.unbounded_face());
-    }
-    CGAL::draw(A_merged);
-}
+
+
+

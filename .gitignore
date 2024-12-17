@@ -1,4 +1,4 @@
-# My additions
+# Our additions
 .DS_Store
 build/
 cmake-build-debug/
@@ -7,6 +7,8 @@ CGAL-6.0.1/
 cmake-build-vcpkg/
 Data/Local/
 Data/Global/results.txt
+Data/Global/outputs.txt
+outputs.txt
 
 # Prerequisites
 *.d

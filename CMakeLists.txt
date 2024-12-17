@@ -5,22 +5,17 @@ set(CMAKE_CXX_STANDARD 20)
 
 #CGAL_Qt6 is needed for the drawing.
 find_package(CGAL REQUIRED OPTIONAL_COMPONENTS Qt6)
-#create the executable of the application
-#create_single_source_cgal_program("main.cpp")
+
 add_executable(main main.cpp Algorithm1.cpp
-        "Algorithm2.cpp"
-        "Algorithm2.h"
+        "GreedyInterval.cpp"
+        "GreedyInterval.h"
         Helper.cpp
-        Helper.h
-        Conversions.cpp
-        Conversions.h)
-target_link_libraries(main PRIVATE CGAL::CGAL) # needed on windows
+        Helper.h)
+target_link_libraries(main PRIVATE CGAL::CGAL)
 
 
 if(CGAL_Qt6_FOUND)
 
-    #link it with the required CGAL libraries
     target_link_libraries(main PUBLIC CGAL::CGAL_Basic_viewer)
 endif()
 
-#end of the file
