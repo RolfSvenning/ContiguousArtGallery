@@ -9,7 +9,7 @@ Polynomial Time" submitted to the 2025 International Symposium on Computational 
 The implementation uses the Computational Geometry Algorithms Library (CGAL) and the Boost Graph Library (BGL).
 To install CGAL, follow the instructions on their website (https://doc.cgal.org/latest/Manual/general_intro.html).
 Note the `Qt6` library is not required by default but is necessary for visualizations (the functions `CGAL::draw(A)`,
-`drawArrangements`, and the include statement `//#include <CGAL/draw_arrangement_2.h>`  are commented out in
+`drawArrangements`, and the include statement `#include <CGAL/draw_arrangement_2.h>`  are commented out in
 `Helper.cpp` and `Algorithm1.cpp`).
 
 
