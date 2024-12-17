@@ -51,7 +51,7 @@ void algorithm1(long T, const Arrangement_2& A){
 
         if (isFinished) {
             writeOutput("../outputs.txt", i, 0, A, Gs, Ps, VPs, pStart, true); // < --- THIS LINE WRITES OUTPUT TO FILE
-            CGAL::draw(A); // needs #include <CGAL/draw_arrangement_2.h>
+//            CGAL::draw(A); // needs #include <CGAL/draw_arrangement_2.h>
             return;
         }
 
@@ -81,7 +81,7 @@ void algorithm1(long T, const Arrangement_2& A){
     }
 
     writeOutput("../outputs.txt", i, j, A, Gs, Ps, VPs, pStart, true); // < --- THIS LINE WRITES OUTPUT TO FILE
-    CGAL::draw(A); // needs #include <CGAL/draw_arrangement_2.h>
+//    CGAL::draw(A); // needs #include <CGAL/draw_arrangement_2.h>
 }
 
 
