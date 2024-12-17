@@ -21,7 +21,7 @@
 
 #include "Algorithm1.h"
 #include "Helper.h"
-#include <CGAL/draw_arrangement_2.h>
+//#include <CGAL/draw_arrangement_2.h>
 
 void algorithm1(long T, const Arrangement_2& A){
     std::cout << "Algorithm 1 running" << std::endl;
