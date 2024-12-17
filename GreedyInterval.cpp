@@ -52,7 +52,7 @@ std::tuple<Point, Halfedge_circulator, Point, bool> greedyInterval(const Arrange
             if (F.do_intersect(VP)) {
                 F.intersection(VP);
             } else {
-                // also check if F and VP intersect at their boundary at a single point (for general position input they cannot share a segment)
+                // also check if F and VP intersect at a single point (for general position input they cannot share a segment)
                 auto FP = polygon_set_to_polygon(F);
                 std::vector<Point> I = findAllIntersectionsBetweenEdgesOfPolygons(FP, VP);
 
