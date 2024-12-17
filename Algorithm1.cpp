@@ -24,8 +24,6 @@
 //#include <CGAL/draw_arrangement_2.h>
 
 void algorithm1(long T, const Arrangement_2& A){
-    std::cout << "Algorithm 1 running" << std::endl;
-
     // Choose arbitrary starting point x_0
     Halfedge_circulator e = getEdgesOfArrangement(A)[1];
     Point p = e -> target() -> point();
