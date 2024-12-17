@@ -2,9 +2,11 @@
 
 This repository contains an implementation of an algorithm for the Contiguous Art Gallery Problem as
 described in the paper "The Contiguous Art Gallery Problem is Solvable in
-Polynomial Time" submitted to the 2025 International Symposium on Computational Geometry (SoCG) by Magnus C. R. Merrild, Casper M. Rysgaard, Jens K. R. Schou, and Rolf Svenning.
+Polynomial Time" submitted to the 2025 International Symposium on Computational Geometry (SoCG) by Magnus C. R. Merrild, 
+Casper M. Rysgaard, Jens K. R. Schou, and Rolf Svenning.
 
-For a simple input polygon, the algorithm finds the smallest partition of the boundary into polygonal chains, each chain visible to a guard in the polygon's interior. 
+For a simple input polygon, the algorithm finds the smallest partition of the boundary into polygonal chains, each 
+chain visible to a guard in the polygon's interior.
 
 ## Dependencies and setup
 The implementation uses the Computational Geometry Algorithms Library (CGAL) and the Boost Graph Library (BGL).
