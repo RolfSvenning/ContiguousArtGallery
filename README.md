@@ -4,6 +4,7 @@ This repository contains an implementation of an algorithm for the Contiguous Ar
 described in the paper "The Contiguous Art Gallery Problem is Solvable in
 Polynomial Time" submitted to the 2025 International Symposium on Computational Geometry (SoCG) by Magnus C. R. Merrild, 
 Casper M. Rysgaard, Jens K. R. Schou, and Rolf Svenning.
+Please cite the paper if you use the code.
 
 For a simple input polygon, the algorithm finds the smallest partition of the boundary into polygonal chains, each 
 chain visible to a guard in the polygon's interior.
